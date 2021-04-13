@@ -108,8 +108,14 @@ public class FFmpegAudioTargetSubstream
         nativeTimeBase.num(1);
         nativeTimeBase.den(outputSampleRate);
 
-        // Smp buffer is 2 frames long, always
-        this.sampleBuffer = new float[(stream.codec().frame_size() * outputChannels) * 2];
+        // Fix for pcm audio which has a a variable frame size ? (at least ffmpeg returns 0 for it)
+        if(stream.codecpar().frame_size() == 0){
+            this.sampleBuffer = new float[(1024* outputChannels) * 2];
+        }
+        else {
+            // Smp buffer is 2 frames long, always
+            this.sampleBuffer = new float[(stream.codec().frame_size() * outputChannels) * 2];
+        }
     }
 
     @Override
